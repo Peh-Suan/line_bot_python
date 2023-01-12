@@ -89,7 +89,7 @@ def callback():
 
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=event.message.text+'_test')
+            TextSendMessage(text=to_reply)
         )
         
 
