@@ -38,11 +38,10 @@ with open(data_path, 'w') as f:
 
 
 if not os.path.isfile(data_path):
-    data = {'Ben':100,
-           '小滑':2323}
+    data = {}
 else:
     with open(data_path, 'r') as f:
-        lines = f.realines()
+        lines = f.readlines()
         print(111)
     data = {line.split('/')[0]:lines.split('/')[1] for line in lines}
 
