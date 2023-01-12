@@ -42,8 +42,9 @@ if not os.path.isfile(data_path):
 else:
     with open(data_path, 'r') as f:
         lines = f.readlines()
-        print(111)
+        
     data = {line.split('/')[0]:line.split('/')[1] for line in lines}
+    print(data)
 
 app = Flask(__name__)
 
@@ -82,9 +83,7 @@ def callback():
             to_reply = f'你還欠 {name} {-amount} 元'
         
         return to_reply
-            
-        
-        
+
     signature = request.headers['X-Line-Signature']
 
     # get request body as text
@@ -100,6 +99,7 @@ def callback():
 
     # if event is MessageEvent and message is TextMessage, then echo text
     for event in events:
+        to_reply = ''
         if not isinstance(event, MessageEvent):
             continue
         if not isinstance(event.message, TextMessage):
@@ -145,7 +145,6 @@ def callback():
             event.reply_token,
             TextSendMessage(text=to_reply)
         )
-        delete_data = False
 
     return 'OK'
 
