@@ -28,24 +28,6 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 
-import os
-
-data_path = 'data.txt'
-
-with open(data_path, 'w') as f:
-    f.writelines('小明/100\n')
-    f.writelines(f'Ben/2300')
-
-
-if not os.path.isfile(data_path):
-    data = {}
-else:
-    with open(data_path, 'r') as f:
-        lines = f.readlines()
-        
-    data = {line.split('/')[0]:int(line.split('/')[1].replace('\n', '')) for line in lines}
-    print(data)
-
 app = Flask(__name__)
 
 # get channel_secret and channel_access_token from your environment variable
@@ -64,6 +46,28 @@ parser = WebhookParser(channel_secret)
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    
+    import os
+
+    data_path = 'data.txt'
+
+    with open(data_path, 'w') as f:
+        f.writelines('小明/100\n')
+        f.writelines(f'Ben/2300')
+
+
+    if not os.path.isfile(data_path):
+        data = {}
+    else:
+        with open(data_path, 'r') as f:
+            lines = f.readlines()
+
+        data = {line.split('/')[0]:int(line.split('/')[1].replace('\n', '')) for line in lines}
+        print(data)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='111')
+        )
     
 #     def write_data(data):
 #         with open(data_path, 'w') as f:
