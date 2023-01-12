@@ -28,6 +28,18 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 
+import os
+
+data_path = 'data.txt'
+if not os.path.isfile(data_path):
+    data = {
+        'Ben': 100,
+        '小王': 4500}
+else:
+    with open(data_path, 'r') as f:
+        lines = f.realines()
+    data = {line.split('/')[0]:lines.split('/')[1] for line in lines}
+
 app = Flask(__name__)
 
 # get channel_secret and channel_access_token from your environment variable
@@ -57,6 +69,7 @@ def callback():
         events = parser.parse(body, signature)
     except InvalidSignatureError:
         abort(400)
+        
 
     # if event is MessageEvent and message is TextMessage, then echo text
     for event in events:
@@ -64,11 +77,21 @@ def callback():
             continue
         if not isinstance(event.message, TextMessage):
             continue
+            
+        if event.message.text=='顯示所有數據':
+            to_reply = ''
+            for idx, name in enumerate(data):
+                to_reply = to_reply+f'{name}: {data[name]}'
+                if idx+1!=len(data):
+                    to_reply= to_reply+'\n'
+        elif event.message.text in data:
+            to_reply = f'{data[event.message.text]}'
 
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=event.message.text+'_test')
         )
+        
 
     return 'OK'
 
