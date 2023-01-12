@@ -64,7 +64,7 @@ def callback():
             to_reply = f'{name} 還欠你 {amount} 元'
         elif amount==0:
             to_reply = f'{name} 沒有欠你錢'
-        else amount:
+        else:
             to_reply = f'你還欠 {name} {-amount} 元'
         
         return to_reply
