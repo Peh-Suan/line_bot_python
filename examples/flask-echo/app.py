@@ -58,6 +58,19 @@ parser = WebhookParser(channel_secret)
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    def show_data(name):
+        amount = data[name]
+        if amount > 0:
+            to_reply = f'{name} 還欠你 {amount} 元'
+        elif amount==0:
+            to_reply = f'{name} 沒有欠你錢'
+        else amount:
+            to_reply = f'你還欠 {name} {-amount} 元'
+        
+        return to_reply
+            
+        
+        
     signature = request.headers['X-Line-Signature']
 
     # get request body as text
@@ -78,14 +91,33 @@ def callback():
         if not isinstance(event.message, TextMessage):
             continue
             
-        if event.message.text=='顯示所有數據':
+        if event.message.text.strip()=='顯示所有數據':
             to_reply = ''
             for idx, name in enumerate(data):
                 to_reply = to_reply+f'{name}: {data[name]}'
                 if idx+1!=len(data):
                     to_reply= to_reply+'\n'
-        elif event.message.text in data:
-            to_reply = f'{data[event.message.text]}'
+                    
+        elif event.message.text.strip() in data:
+            
+            to_reply = show_data(event.message.text.strip())
+
+        
+        else:
+            if '+' in event.message.text or '-' in event.message.text:
+                if '+' in event.message.text
+                    name = event.message.text.split('+')[0].strip()
+                    amount = int(event.message.text.split('+')[1].strip())
+            
+                elif '-' in event.message.text:
+                    name = event.message.text.split('-')[0].strip()
+                    amount = -int(event.message.text.split('-')[1].strip())
+                if name in data:
+                    data[name] += amount
+                else:
+                    data[name] = amount
+
+                to_reply = show_data(name)
 
         line_bot_api.reply_message(
             event.reply_token,
