@@ -104,6 +104,10 @@ def callback():
                 event.reply_token,
                 TextSendMessage(text='請稍候...')
             )
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text='謝謝')
+            )
             
             if not isinstance(event, MessageEvent):
                 continue
