@@ -43,114 +43,113 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
 
+import os
+
+data_path = 'data.txt'
+
+with open(data_path, 'w') as f:
+    f.writelines('小明/100\n')
+    f.writelines(f'Ben/2300')
+
+
+if not os.path.isfile(data_path):
+    data = {}
+else:
+    with open(data_path, 'r') as f:
+        lines = f.readlines()
+
+    data = {line.split('/')[0]:int(line.split('/')[1].replace('\n', '')) for line in lines}
+    print(data)
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
-    
-    import os
-
-    data_path = 'data.txt'
-
-    with open(data_path, 'w') as f:
-        f.writelines('小明/100\n')
-        f.writelines(f'Ben/2300')
-
-
-    if not os.path.isfile(data_path):
-        data = {}
-    else:
-        with open(data_path, 'r') as f:
-            lines = f.readlines()
-
-        data = {line.split('/')[0]:int(line.split('/')[1].replace('\n', '')) for line in lines}
-        print(data)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='111')
-        )
-    
-#     def write_data(data):
-#         with open(data_path, 'w') as f:
-#             for idx, name in data:
-#                 if idx+1!=len(data):
-#                     f.writelines(f'{name}/{data[name]}\n')
-#                 else:
-#                     f.writelines(f'{name}/{data[name]}')
-    
-    def show_data(name):
-        amount = data[name]
-        if amount > 0:
-            to_reply = f'{name} 還欠你 {amount} 元'
-        elif amount==0:
-            to_reply = f'{name} 沒有欠你錢'
-        else:
-            to_reply = f'你還欠 {name} {-amount} 元'
-        
-        return to_reply
-
-    signature = request.headers['X-Line-Signature']
-
-    # get request body as text
-    body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
-
-    # parse webhook body
     try:
-        events = parser.parse(body, signature)
-    except InvalidSignatureError:
-        abort(400)
-        
+    
+    #     def write_data(data):
+    #         with open(data_path, 'w') as f:
+    #             for idx, name in data:
+    #                 if idx+1!=len(data):
+    #                     f.writelines(f'{name}/{data[name]}\n')
+    #                 else:
+    #                     f.writelines(f'{name}/{data[name]}')
 
-    # if event is MessageEvent and message is TextMessage, then echo text
-    for event in events:
-        to_reply = ''
-        if not isinstance(event, MessageEvent):
-            continue
-        if not isinstance(event.message, TextMessage):
-            continue
-            
-            
-        if event.message.text.strip()=='顯示名單':
-            
-            if data=={}:
-                to_reply = '尚無名單'
+        def show_data(name):
+            amount = data[name]
+            if amount > 0:
+                to_reply = f'{name} 還欠你 {amount} 元'
+            elif amount==0:
+                to_reply = f'{name} 沒有欠你錢'
             else:
-                to_reply = ''
-                for idx, name in enumerate(data):
-                    to_reply = to_reply+f'{name}: {data[name]}'
-                    if idx+1!=len(data):
-                        to_reply= to_reply+'\n'
-                    
-        elif event.message.text.strip() in data:
-            
-            to_reply = show_data(event.message.text.strip())
-        
-        elif event.message.text.strip()=='刪除資料':
-            data = {}
-            to_reply = '名單已清空'
-        
-        else:
-            if '+' in event.message.text or '-' in event.message.text:
-                if '+' in event.message.text:
-                    name = event.message.text.split('+')[0].strip()
-                    amount = int(event.message.text.split('+')[1].strip())
-            
-                elif '-' in event.message.text:
-                    name = event.message.text.split('-')[0].strip()
-                    amount = -int(event.message.text.split('-')[1].strip())
-                if name in data:
-                    data[name] += amount
+                to_reply = f'你還欠 {name} {-amount} 元'
+
+            return to_reply
+
+        signature = request.headers['X-Line-Signature']
+
+        # get request body as text
+        body = request.get_data(as_text=True)
+        app.logger.info("Request body: " + body)
+
+        # parse webhook body
+        try:
+            events = parser.parse(body, signature)
+        except InvalidSignatureError:
+            abort(400)
+
+
+        # if event is MessageEvent and message is TextMessage, then echo text
+        for event in events:
+            to_reply = ''
+            if not isinstance(event, MessageEvent):
+                continue
+            if not isinstance(event.message, TextMessage):
+                continue
+
+
+            if event.message.text.strip()=='顯示名單':
+
+                if data=={}:
+                    to_reply = '尚無名單'
                 else:
-                    data[name] = amount
+                    to_reply = ''
+                    for idx, name in enumerate(data):
+                        to_reply = to_reply+f'{name}: {data[name]}'
+                        if idx+1!=len(data):
+                            to_reply= to_reply+'\n'
 
-                to_reply = show_data(name)
+            elif event.message.text.strip() in data:
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=to_reply)
-        )
+                to_reply = show_data(event.message.text.strip())
 
-    return 'OK'
+            elif event.message.text.strip()=='刪除資料':
+                data = {}
+                to_reply = '名單已清空'
+
+            else:
+                if '+' in event.message.text or '-' in event.message.text:
+                    if '+' in event.message.text:
+                        name = event.message.text.split('+')[0].strip()
+                        amount = int(event.message.text.split('+')[1].strip())
+
+                    elif '-' in event.message.text:
+                        name = event.message.text.split('-')[0].strip()
+                        amount = -int(event.message.text.split('-')[1].strip())
+                    if name in data:
+                        data[name] += amount
+                    else:
+                        data[name] = amount
+
+                    to_reply = show_data(name)
+
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=to_reply)
+            )
+
+        return 'OK'
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":
