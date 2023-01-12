@@ -43,7 +43,7 @@ else:
     with open(data_path, 'r') as f:
         lines = f.readlines()
         print(111)
-    data = {line.split('/')[0]:lines.split('/')[1] for line in lines}
+    data = {line.split('/')[0]:line.split('/')[1] for line in lines}
 
 app = Flask(__name__)
 
