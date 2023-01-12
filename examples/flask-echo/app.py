@@ -104,6 +104,7 @@ def callback():
         if delete_data and event.message.text.strip()=='是':
             data = {}
             
+            
         if event.message.text.strip()=='顯示名單':
             
             if data=={}:
@@ -144,6 +145,7 @@ def callback():
             TextSendMessage(text=to_reply)
         )
         write_data()
+        delete_data = False
 
     return 'OK'
 
