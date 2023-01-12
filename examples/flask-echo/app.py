@@ -100,14 +100,6 @@ def callback():
 
         # if event is MessageEvent and message is TextMessage, then echo text
         for event in events:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='請稍候...')
-            )
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='謝謝')
-            )
             
             if not isinstance(event, MessageEvent):
                 continue
