@@ -105,7 +105,7 @@ def callback():
         
         else:
             if '+' in event.message.text or '-' in event.message.text:
-                if '+' in event.message.text
+                if '+' in event.message.text:
                     name = event.message.text.split('+')[0].strip()
                     amount = int(event.message.text.split('+')[1].strip())
             
