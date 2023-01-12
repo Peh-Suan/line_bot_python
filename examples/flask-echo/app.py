@@ -32,9 +32,7 @@ import os
 
 data_path = 'data.txt'
 if not os.path.isfile(data_path):
-    data = {
-        'Ben': 100,
-        '小王': 4500}
+    data = {}
 else:
     with open(data_path, 'r') as f:
         lines = f.realines()
@@ -55,9 +53,21 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
 
+delete_data = False
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    global delete_data
+    
+    def write_data():
+        with open(data_path, 'w') as f:
+            for idx, name in data:
+                if idx+1!=len(data):
+                    f.writelines(f'{name}/{data[name]}\n')
+                else:
+                    f.writelines(f'{name}/{data[name]}')
+    
     def show_data(name):
         amount = data[name]
         if amount > 0:
@@ -90,18 +100,28 @@ def callback():
             continue
         if not isinstance(event.message, TextMessage):
             continue
+        
+        if delete_data and event.message.text.strip()=='是':
+            data = {}
             
-        if event.message.text.strip()=='顯示所有數據':
-            to_reply = ''
-            for idx, name in enumerate(data):
-                to_reply = to_reply+f'{name}: {data[name]}'
-                if idx+1!=len(data):
-                    to_reply= to_reply+'\n'
+        if event.message.text.strip()=='顯示名單':
+            
+            if data=={}:
+                to_reply = '尚無名單'
+            else:
+                to_reply = ''
+                for idx, name in enumerate(data):
+                    to_reply = to_reply+f'{name}: {data[name]}'
+                    if idx+1!=len(data):
+                        to_reply= to_reply+'\n'
                     
         elif event.message.text.strip() in data:
             
             to_reply = show_data(event.message.text.strip())
-
+        
+        elif event.message.text.strip()=='刪除資料':
+            delete_data = True
+            to_reply = '確認刪除所有資料？（是/否）'
         
         else:
             if '+' in event.message.text or '-' in event.message.text:
@@ -123,7 +143,7 @@ def callback():
             event.reply_token,
             TextSendMessage(text=to_reply)
         )
-        
+        write_data()
 
     return 'OK'
 
