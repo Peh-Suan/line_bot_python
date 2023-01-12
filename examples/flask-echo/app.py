@@ -74,7 +74,7 @@ def callback():
     #                 else:
     #                     f.writelines(f'{name}/{data[name]}')
 
-        def show_data(name):
+        def show_data(data, name):
             amount = data[name]
             if amount > 0:
                 to_reply = f'{name} 還欠你 {amount} 元'
@@ -102,7 +102,7 @@ def callback():
         for event in events:
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text='ddd')
+                TextSendMessage(text=show_data(data, event.message.text.strip()))
             )
             to_reply = ''
             if not isinstance(event, MessageEvent):
