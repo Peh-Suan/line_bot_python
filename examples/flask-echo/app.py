@@ -66,13 +66,13 @@ else:
 def callback():
     try:
     
-    #     def write_data(data):
-    #         with open(data_path, 'w') as f:
-    #             for idx, name in data:
-    #                 if idx+1!=len(data):
-    #                     f.writelines(f'{name}/{data[name]}\n')
-    #                 else:
-    #                     f.writelines(f'{name}/{data[name]}')
+        def write_data(data):
+            with open(data_path, 'w') as f:
+                for idx, name in data:
+                    if idx+1!=len(data):
+                        f.writelines(f'{name}/{data[name]}\n')
+                    else:
+                        f.writelines(f'{name}/{data[name]}')
 
         def show_data(data, name):
             amount = data[name]
@@ -102,54 +102,55 @@ def callback():
         for event in events:
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text=show_data(data, event.message.text.strip()))
+                TextSendMessage(text='請稍候...')
             )
-            to_reply = ''
+            
             if not isinstance(event, MessageEvent):
                 continue
             if not isinstance(event.message, TextMessage):
                 continue
+                
+            to_reply = ''
+            if event.message.text.strip()=='顯示名單':
 
+                if data=={}:
+                    to_reply = '尚無名單'
+                else:
 
-#             if event.message.text.strip()=='顯示名單':
+                    for idx, name in enumerate(data):
+                        to_reply = to_reply+f'{name}: {data[name]}'
+                        if idx+1!=len(data):
+                            to_reply= to_reply+'\n'
 
-#                 if data=={}:
-#                     to_reply = '尚無名單'
-#                 else:
-#                     to_reply = ''
-#                     for idx, name in enumerate(data):
-#                         to_reply = to_reply+f'{name}: {data[name]}'
-#                         if idx+1!=len(data):
-#                             to_reply= to_reply+'\n'
+            elif event.message.text.strip() in data:
 
-#             elif event.message.text.strip() in data:
+                to_reply = show_data(event.message.text.strip())
 
-#                 to_reply = show_data(event.message.text.strip())
+            elif event.message.text.strip()=='刪除資料':
+                data = {}
+                to_reply = '名單已清空'
 
-#             elif event.message.text.strip()=='刪除資料':
-#                 data = {}
-#                 to_reply = '名單已清空'
+            else:
+                if '+' in event.message.text or '-' in event.message.text:
+                    if '+' in event.message.text:
+                        name = event.message.text.split('+')[0].strip()
+                        amount = int(event.message.text.split('+')[1].strip())
 
-#             else:
-#                 if '+' in event.message.text or '-' in event.message.text:
-#                     if '+' in event.message.text:
-#                         name = event.message.text.split('+')[0].strip()
-#                         amount = int(event.message.text.split('+')[1].strip())
+                    elif '-' in event.message.text:
+                        name = event.message.text.split('-')[0].strip()
+                        amount = -int(event.message.text.split('-')[1].strip())
+                    if name in data:
+                        data[name] += amount
+                    else:
+                        data[name] = amount
 
-#                     elif '-' in event.message.text:
-#                         name = event.message.text.split('-')[0].strip()
-#                         amount = -int(event.message.text.split('-')[1].strip())
-#                     if name in data:
-#                         data[name] += amount
-#                     else:
-#                         data[name] = amount
+                    to_reply = show_data(name)
 
-#                     to_reply = show_data(name)
-
-#             line_bot_api.reply_message(
-#                 event.reply_token,
-#                 TextSendMessage(text=to_reply)
-#             )
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=to_reply)
+            )
+            write_data(data)
 
         return 'OK'
     except Exception as e:
