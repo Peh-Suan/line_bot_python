@@ -114,7 +114,7 @@ def callback():
 
             elif event.message.text.strip() in data:
 
-                to_reply = show_data(event.message.text.strip())
+                to_reply = show_data(data, event.message.text.strip())
 
             elif event.message.text.strip()=='刪除資料':
                 data = {}
@@ -134,7 +134,7 @@ def callback():
                     else:
                         data[name] = amount
 
-                    to_reply = show_data(name)
+                    to_reply = show_data(data, name)
 
             line_bot_api.reply_message(
                 event.reply_token,
