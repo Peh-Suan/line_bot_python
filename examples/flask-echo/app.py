@@ -45,25 +45,19 @@ parser = WebhookParser(channel_secret)
 
 import os
 
-data_path = 'data.txt'
-
-with open(data_path, 'w') as f:
-    f.writelines('小明/100\n')
-    f.writelines(f'Ben/2300')
-
-
-if not os.path.isfile(data_path):
-    data = {}
-else:
-    with open(data_path, 'r') as f:
-        lines = f.readlines()
-
-    data = {line.split('/')[0]:int(line.split('/')[1].replace('\n', '')) for line in lines}
-    print(data)
-
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    data_path = 'data.txt'
+    
+    if not os.path.isfile(data_path):
+        data = {}
+    else:
+        with open(data_path, 'r') as f:
+            lines = f.readlines()
+
+        data = {line.split('/')[0]:int(line.split('/')[1].replace('\n', '')) for line in lines}
+
     try:
     
         def write_data(data):
