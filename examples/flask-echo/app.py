@@ -52,9 +52,11 @@ def callback():
     
     if not os.path.isfile(data_path):
         data = {}
+        print('Initiating new data...')
     else:
         with open(data_path, 'r') as f:
             lines = f.readlines()
+            print('data appended')
 
         data = {line.split('/')[0]:int(line.split('/')[1].replace('\n', '')) for line in lines}
 
