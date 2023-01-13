@@ -102,10 +102,7 @@ def callback():
                 
             to_reply = ''
             if event.message.text.strip()=='顯示名單':
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(text=f'{data}')
-                )
+
                 if data=={}:
                     to_reply = '尚無名單'
                 else:
@@ -139,10 +136,10 @@ def callback():
 
                     to_reply = show_data(name)
 
-#             line_bot_api.reply_message(
-#                 event.reply_token,
-#                 TextSendMessage(text=to_reply)
-#             )
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=to_reply)
+            )
             write_data(data)
 
         return 'OK'
