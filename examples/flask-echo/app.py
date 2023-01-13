@@ -148,6 +148,7 @@ def callback():
         return 'OK'
     except Exception as e:
         print(e)
+        return 'OK'
 
 
 if __name__ == "__main__":
