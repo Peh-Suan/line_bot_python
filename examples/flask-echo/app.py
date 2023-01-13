@@ -60,9 +60,9 @@ def callback():
 
     try:
     
-        def write_data(data):
+        def write_data(data_path, data):
             with open(data_path, 'w') as f:
-                for idx, name in data:
+                for idx, name in enumerate(data):
                     if idx+1!=len(data):
                         f.writelines(f'{name}/{data[name]}\n')
                     else:
@@ -140,7 +140,7 @@ def callback():
                 event.reply_token,
                 TextSendMessage(text=to_reply)
             )
-            write_data(data)
+            write_data(data_path, data)
 
         return 'OK'
     except Exception as e:
